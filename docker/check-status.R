@@ -1,3 +1,6 @@
+# Modified version from pharmaverse/admiralci
+# See https://github.com/pharmaverse/admiralci/tree/61347fe11955297818b3ca7814fc7328f2ad7840/.github/actions/cran-status-extract
+
 if (!requireNamespace("optparse", quietly = TRUE)) {
   suppressMessages(install.packages("optparse",
     repos = "https://cloud.r-project.org",

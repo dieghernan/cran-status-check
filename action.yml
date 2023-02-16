@@ -7,23 +7,22 @@ branding:
 inputs:
   path:
     description: |
-      Path to the R package root, if the package is not at the top level of 
+      Path to the R package root, if the package is not at the top level of
       the repository.
     default: "."
     required: false
     type: string
   package:
     description: |
-      Package to check. If provided, it would have priority over the 
+      Package to check. If provided, it would have priority over the
       package on the repo.
     required: false
     default: ""
     type: string
   statuses:
     description: |
-      Create an issue if one or more of the following statuses are 
-      reported on the check report. This is a comma-separated string of 
-      statuses. Default value is ''WARN,ERROR'. Allowed statuses are 
+      CRAN status to check. This is a comma-separated string of
+      statuses. Default value is ''WARN,ERROR'. Allowed statuses are
       'NOTE', 'WARN', and 'ERROR'.
     default: "WARN,ERROR"
     required: false
@@ -50,7 +49,9 @@ inputs:
     required: false
     type: string
 
-
+# Workflow derived from pharmaverse/admiralci
+# See for the original work from which this workflow is derived
+# https://github.com/pharmaverse/admiralci/blob/61347fe11955297818b3ca7814fc7328f2ad7840/.github/workflows/cran-status.yml
 runs:
   using: composite
   steps:
@@ -61,29 +62,29 @@ runs:
         # Get package name to check
         echo "::group::Get package name to check"
         package_name="${{ inputs.package }}"
-        if [ -z "$package_name" ]; then 
+        if [ -z "$package_name" ]; then
           path="${{ inputs.path }}"
           file=$path/DESCRIPTION
-          
-          if [ ! -f "$file" ]; then 
+
+          if [ ! -f "$file" ]; then
             echo "::error::DESCRIPTION file not found on $path directory"
             exit 1
           fi
-          
+
           package_name=$(grep "Package:" $file | awk '{print $NF}')
         fi
-        if [ -z "$package_name" ]; then 
+        if [ -z "$package_name" ]; then
           echo "::error::Not package name found on $file"
           exit 1
         fi
         echo "package_name=$package_name" >> $GITHUB_OUTPUT
         echo "Testing package: $package_name"
         echo "::endgroup::"
-        
+
 
     - name: Compute Cran Status codes
       uses: dieghernan/cran-status-check/docker@main
-      with: 
+      with:
         statuses: "${{ inputs.statuses }}"
         package: "${{ steps.pkg.outputs.package_name }}"
 
