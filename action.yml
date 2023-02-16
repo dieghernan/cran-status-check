@@ -94,3 +94,22 @@ runs:
           new_errors=true
         fi
         echo "new_errors=$new_errors" >> $GITHUB_OUTPUT
+
+    - name: Get Date
+      id: today
+      run: |
+        echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+    - name: Report Status
+      if: ${{ steps.cran_errors_status.outputs.new_errors == 'true' && inputs.create-issue == 'true' }}
+      uses: peter-evans/create-issue-from-file@v4
+      with:
+        title: "URGENT! Failed CRAN Checks for ${{ steps.current_package.outputs.package_name }}: ${{ steps.today.outputs.date }}"
+        content-filepath: cran-status.md
+        assignees: ${{ inputs.issue-assignees }}
+
+    - name: Fail workflow
+      if: ${{ steps.cran_errors_status.outputs.new_errors == 'true' }}
+      shell: Rscript {0}
+      run |
+        stop("CRAN checks are not ok, see Job Summary of this GH action for details")
