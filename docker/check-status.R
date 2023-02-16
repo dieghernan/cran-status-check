@@ -144,7 +144,7 @@ if (!httr::http_error(url)) {
 
   cran_status(paste0(
     ":x: **Package ", pkg,
-    " not found on CRAN.\n\n"
+    " not found on CRAN**:\n\n"
   ))
   cran_status(paste0("Error accessing url:\n", url))
 
