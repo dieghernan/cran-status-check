@@ -64,6 +64,10 @@ build_md5_codes <- function(pkg, errors, step) {
   return(errors)
 }
 
+cran_status <- function(x) {
+      cat(x, file = "cran-status.md", append = TRUE, sep = "\n")
+}
+
 pkg <- opt$package # paste(desc::desc_get(keys = "Package"))
 
 cat("Testing package:", pkg, "\n-----\n")
@@ -86,17 +90,22 @@ if (!httr::http_error(url)) {
 
   # If errors table is empty: just get out !
   if (dim(errors)[1] == 0) {
-    print(
+    cat(
       sprintf("None of this status found in the CRAN table. (status=%s)", status_types)
     )
-
-    writeLines(
-      paste0(
-        "# :heavy_check_mark: ", pkg, "\n\n",
-        sprintf("None of this status found in the CRAN table. (status=`%s`)", status_types)
-      ),
-      con = "cran-status.md"
-    )
+    
+    cran_status(sprintf(
+        "**:white_check_mark: CRAN error for %s not found with (`%s`)s**:\n\n",
+        pkg,
+        status_types
+      ))
+    
+      cran_status("\nSee the table below for a summary of the checks run by CRAN:\n\n")
+      cran_status(knitr::kable(checks))
+      cran_status(sprintf(
+        "\n\nAll details and logs are available here: %s", url
+      ))
+    
   } else {
     # Build each step md5 code
     errors <- build_md5_codes(pkg, errors, "Build")
@@ -110,12 +119,9 @@ if (!httr::http_error(url)) {
     errors %>%
       select(Flavor, CheckId, InstallId, BuildId) %>%
       write.csv("cran_errors.csv", row.names = FALSE)
-    cran_status <- function(x) {
-      cat(x, file = "cran-status.md", append = TRUE, sep = "\n")
-    }
     if (any(checks$Status %in% statuses)) {
       cran_status(sprintf(
-        "**:red_circle: CRAN checks for %s resulted in one or more (`%s`)s**:\n\n",
+        "**:x: CRAN checks for %s resulted in one or more (`%s`)s**:\n\n",
         pkg,
         status_types
       ))
@@ -132,16 +138,14 @@ if (!httr::http_error(url)) {
     }
   }
 } else {
-  cat(paste("ERROR ACCESSING URL=", url))
-
-  writeLines(
-    c(paste0(
-      "**`", pkg, "` not found on CRAN**",
-      "\n\n",
-      paste0("Error accessing url:\n", url)
-    )),
-    "cran-status.md"
-  )
+  cat(paste0("::warning::Package ", pkg,
+  " not found on CRAN."
+  ))
+  
+  cran_status(paste0("**:x: Package ", pkg,
+  " not found on CRAN.\n\n"))
+  cran_status(paste0("Error accessing url:\n", url))
+  
   # Copy
   file.copy("cran-status.md", "issue.md")
 }
