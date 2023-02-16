@@ -57,9 +57,6 @@ runs:
         package_name="${{ inputs.package }}"
         if [ -z "$package_name" ]; then 
           path="${{ inputs.path }}"
-          if [ -z "$package_name" ]; then
-            path="."
-          fi
           package_name=$(grep "Package:" $path/DESCRIPTION | awk '{print $NF}')
         fi
         if [ -z "$package_name" ]; then 
