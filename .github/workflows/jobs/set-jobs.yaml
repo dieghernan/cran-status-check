@@ -1,0 +1,74 @@
+on:
+  workflow_call:
+    inputs:
+      path:
+        description: |
+          Path to the R package root, if the package is not at the top level of 
+          the repository.
+        default: '.'
+        required: false
+        type: string
+      package:
+        description: | 
+          Package to check. If provided, it would have priority over the 
+          package on the repo.
+        required: false
+        default: '' 
+        type: string
+      statuses:
+        description: |
+          Create an issue if one or more of the following statuses are 
+          reported on the check report. This is a comma-separated string of 
+          statuses. Default value is ''WARN,ERROR'. Allowed statuses are 
+          'NOTE', 'WARN', and 'ERROR'.
+        default: 'WARN,ERROR'
+        required: false
+        type: string
+      create-issue:
+        description: |
+          Logical, create an issue on CRAN failed checks
+        default: 'true'
+        required: false
+        type: boolean
+      issue-assignees:
+        description: |
+          Whom should the issue be assigned to if errors are
+          encountered in the CRAN status checks?
+          This is a comma-separated string of GitHub usernames.
+          If undefined or empty, no assignments are made.
+        default: ''
+        required: false
+        type: string
+
+jobs:
+  pakname:
+    name: Detect package name
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Get current package name
+      id: current_package
+      shell: bash
+      run: |
+        echo "::group::Get package name to check"
+        package_name="${{ inputs.package }}"
+        if [ -z "$package_name" ]; then 
+          path="${{ inputs.path }}"
+          if [ -z "$package_name" ]; then
+            path="."
+          fi
+          package_name=$(grep "Package:" $path/DESCRIPTION | awk '{print $NF}')
+        fi
+        if [ -z "$package_name" ]; then 
+          echo "::error::DESCRIPTION file not found on $path dir"
+          exit 1
+        fi
+        echo "package_name=$package_name" >> $GITHUB_OUTPUT
+        echo "::endgroup::"
+        
+        echo "Testing package: $package_name"
+        
+        
+    

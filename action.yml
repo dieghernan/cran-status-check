@@ -49,7 +49,7 @@ runs:
   using: composite
   steps:
     - name: Build and deploy
-      uses: dieghernan/ga-sandbox/.github/workflows/jobs/set-jobs.yaml@main
+      uses: dieghernan/cran-status-check/.github/workflows/jobs/set-jobs.yaml@main
       with:
         path: ${{inputs.path}}
         package: ${{inputs.package}}
