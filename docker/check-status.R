@@ -95,7 +95,7 @@ if (!httr::http_error(url)) {
     )
     
     cran_status(sprintf(
-        "**:white_check_mark: CRAN error for %s not found with (`%s`)s**:\n\n",
+        "** :white_check_mark: CRAN error for %s not found with (`%s`)s**:\n\n",
         pkg,
         status_types
       ))
@@ -121,7 +121,7 @@ if (!httr::http_error(url)) {
       write.csv("cran_errors.csv", row.names = FALSE)
     if (any(checks$Status %in% statuses)) {
       cran_status(sprintf(
-        "**:x: CRAN checks for %s resulted in one or more (`%s`)s**:\n\n",
+        "** :x: CRAN checks for %s resulted in one or more (`%s`)s**:\n\n",
         pkg,
         status_types
       ))
@@ -142,7 +142,7 @@ if (!httr::http_error(url)) {
   " not found on CRAN."
   ))
   
-  cran_status(paste0("**:x: Package ", pkg,
+  cran_status(paste0("** :x: Package ", pkg,
   " not found on CRAN.\n\n"))
   cran_status(paste0("Error accessing url:\n", url))
   
