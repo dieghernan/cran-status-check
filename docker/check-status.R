@@ -1,10 +1,13 @@
 if (!requireNamespace("optparse", quietly = TRUE)) {
   suppressMessages(install.packages("optparse",
     repos = "https://cloud.r-project.org",
-    verbose = FALSE
+    verbose = FALSE,
+    quiet = TRUE
   ))
 }
 
+if (file.exists("cran-status.md")) unlink("cran-status.md")
+if (file.exists("issue.md")) unlink("issue.md")
 
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(rvest))
@@ -89,8 +92,8 @@ if (!httr::http_error(url)) {
 
     writeLines(
       paste0(
-        ":white_check_mark: ", pkg, "\n",
-        sprintf("None of this status found in the CRAN table. (status=%s)", status_types)
+        "# :heavy_check_mark: ", pkg, "\n\n",
+        sprintf("None of this status found in the CRAN table. (status=`%s``)", status_types)
       ),
       con = "cran-status.md"
     )
@@ -112,7 +115,7 @@ if (!httr::http_error(url)) {
     }
     if (any(checks$Status %in% statuses)) {
       cran_status(sprintf(
-        "**CRAN checks for %s resulted in one or more (%s)s**:\n\n",
+        "**:red_circle: CRAN checks for %s resulted in one or more (`%s`)s**:\n\n",
         pkg,
         status_types
       ))
@@ -125,7 +128,7 @@ if (!httr::http_error(url)) {
       # Copy
       file.copy("cran-status.md", "issue.md")
 
-      print("<U+274C> One or more CRAN checks resulted in an invalid status <U+274C>")
+      cat("::warning::One or more CRAN checks resulted in an invalid status\n")
     }
   }
 } else {
@@ -133,10 +136,12 @@ if (!httr::http_error(url)) {
 
   writeLines(
     c(paste0(
-      "# Is `", pkg, "` available on CRAN?",
+      "**`", pkg, "` not found on CRAN**",
       "\n\n",
-      paste0("Error accessing url ", url)
+      paste0("Error accessing url:\n", url)
     )),
     "cran-status.md"
   )
+  # Copy
+  file.copy("cran-status.md", "issue.md")
 }
