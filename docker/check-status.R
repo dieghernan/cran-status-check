@@ -1,6 +1,8 @@
 if (!requireNamespace("optparse", quietly = TRUE)) {
-  install.packages("optparse", repos = "https://cloud.r-project.org", 
-                   verbose = FALSE)
+  suppressMessages(install.packages("optparse",
+    repos = "https://cloud.r-project.org",
+    verbose = FALSE
+  ))
 }
 
 
@@ -84,14 +86,14 @@ if (!httr::http_error(url)) {
     print(
       sprintf("None of this status found in the CRAN table. (status=%s)", status_types)
     )
-    
-    writeLines(paste0(
-      ":white_check_mark: ", pkg,"\n", 
-      sprintf("None of this status found in the CRAN table. (status=%s)", status_types)
-    ), 
-    con = "cran-status.md"
+
+    writeLines(
+      paste0(
+        ":white_check_mark: ", pkg, "\n",
+        sprintf("None of this status found in the CRAN table. (status=%s)", status_types)
+      ),
+      con = "cran-status.md"
     )
-    
   } else {
     # Build each step md5 code
     errors <- build_md5_codes(pkg, errors, "Build")
@@ -119,22 +121,22 @@ if (!httr::http_error(url)) {
       cran_status(sprintf(
         "\n\nAll details and logs are available here: %s", url
       ))
-      
-      # Copy 
+
+      # Copy
       file.copy("cran-status.md", "issue.md")
-      
-      print("❌ One or more CRAN checks resulted in an invalid status ❌")
+
+      print("<U+274C> One or more CRAN checks resulted in an invalid status <U+274C>")
     }
   }
 } else {
   cat(paste("ERROR ACCESSING URL=", url))
 
   writeLines(
-    c(paste0("# Is `", pkg, "` available on CRAN?",
+    c(paste0(
+      "# Is `", pkg, "` available on CRAN?",
       "\n\n",
-      paste0("Error accessing url ", url))),
-  "cran-status.md")
+      paste0("Error accessing url ", url)
+    )),
+    "cran-status.md"
+  )
 }
-
-cat(paste0(path.expand(list.files(full.names = TRUE, recursive = TRUE)), collapse = "\n"), sep = "\n")
-    

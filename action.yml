@@ -52,6 +52,7 @@ runs:
       id: current_package
       shell: bash
       run: |
+        # Get package name to check
         echo "::group::Get package name to check"
         package_name="${{ inputs.package }}"
         if [ -z "$package_name" ]; then 
@@ -66,12 +67,30 @@ runs:
           exit 1
         fi
         echo "package_name=$package_name" >> $GITHUB_OUTPUT
+        echo "Testing package: $package_name"
         echo "::endgroup::"
         
-        echo "Testing package: $package_name"
 
     - name: Compute Cran Status codes
       uses: dieghernan/cran-status-check/docker@main
       with: 
         statuses: "${{ inputs.statuses }}"
         package: "${{ steps.current_package.outputs.package_name }}"
+
+      # Report check
+    - name: Upload results
+      shell: bash
+      run: |
+        # Upload results
+        cat cran-status.md >$GITHUB_STEP_SUMMARY
+
+    - name: Check for errors
+      id: cran_errors_status
+      shell: bash
+      run: |
+        # Identify errors
+        new_errors=false
+        if test -f "issue.md"; then
+          new_errors=true
+        fi
+        echo "new_errors=$new_errors" >> $GITHUB_OUTPUT
