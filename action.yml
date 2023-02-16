@@ -63,10 +63,17 @@ runs:
         package_name="${{ inputs.package }}"
         if [ -z "$package_name" ]; then 
           path="${{ inputs.path }}"
-          package_name=$(grep "Package:" $path/DESCRIPTION | awk '{print $NF}')
+          file=$path/DESCRIPTION
+          
+          if [ ! -f "$file" ]; then 
+            echo "::error::DESCRIPTION file not found on $path directory"
+            exit 1
+          fi
+          
+          package_name=$(grep "Package:" $file | awk '{print $NF}')
         fi
         if [ -z "$package_name" ]; then 
-          echo "::error::DESCRIPTION file not found on $path dir"
+          echo "::error::Not package name found on $file"
           exit 1
         fi
         echo "package_name=$package_name" >> $GITHUB_OUTPUT
