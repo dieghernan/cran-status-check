@@ -1,8 +1,13 @@
-if (!require("optparse")) install.packages("optparse", repos = "https://cloud.r-project.org")
-library(dplyr)
-library(rvest)
-library(stringr)
-library(digest)
+if (!requireNamespace("optparse", quietly = TRUE)) {
+  install.packages("optparse", repos = "https://cloud.r-project.org", 
+                   verbose = FALSE)
+}
+
+
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(rvest))
+suppressPackageStartupMessages(library(stringr))
+suppressPackageStartupMessages(library(digest))
 
 # check if needed : package name and working dir path as input arguments :
 library(optparse)
@@ -13,7 +18,7 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(c("-s", "--statuses"),
-    type = "character", default = "ERROR,WARN",
+    type = "character", default = "ERROR,WARN,NOTE",
     help = "status types (comma separated list, for exemple ERROR,WARN,NOTE",
     metavar = "character"
   )
@@ -55,6 +60,9 @@ build_md5_codes <- function(pkg, errors, step) {
 }
 
 pkg <- opt$package # paste(desc::desc_get(keys = "Package"))
+
+cat("Testing package:", pkg, "\n-----\n")
+
 url <- sprintf("https://cran.r-project.org/web/checks/check_results_%s.html", pkg)
 
 if (!httr::http_error(url)) {
@@ -76,6 +84,14 @@ if (!httr::http_error(url)) {
     print(
       sprintf("None of this status found in the CRAN table. (status=%s)", status_types)
     )
+    
+    writeLines(paste0(
+      ":white_check_mark: ", pkg,"\n", 
+      sprintf("None of this status found in the CRAN table. (status=%s)", status_types)
+    ), 
+    con = "cran-status.md"
+    )
+    
   } else {
     # Build each step md5 code
     errors <- build_md5_codes(pkg, errors, "Build")
@@ -94,7 +110,7 @@ if (!httr::http_error(url)) {
     }
     if (any(checks$Status %in% statuses)) {
       cran_status(sprintf(
-        "CRAN checks for %s resulted in one or more (%s)s:\n\n",
+        "**CRAN checks for %s resulted in one or more (%s)s**:\n\n",
         pkg,
         status_types
       ))
@@ -103,9 +119,22 @@ if (!httr::http_error(url)) {
       cran_status(sprintf(
         "\n\nAll details and logs are available here: %s", url
       ))
+      
+      # Copy 
+      file.copy("cran-status.md", "issue.md")
+      
       print("❌ One or more CRAN checks resulted in an invalid status ❌")
     }
   }
 } else {
-  print(paste("ERROR ACCESSING URL=", url))
+  cat(paste("ERROR ACCESSING URL=", url))
+
+  writeLines(
+    c(paste0("# Is `", pkg, "` available on CRAN?",
+      "\n\n",
+      paste0("Error accessing url ", url))),
+  "cran-status.md")
 }
+
+cat(paste0(path.expand(list.files(full.names = TRUE, recursive = TRUE)), collapse = "\n"), sep = "\n")
+    

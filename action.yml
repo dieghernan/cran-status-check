@@ -69,3 +69,9 @@ runs:
         echo "::endgroup::"
         
         echo "Testing package: $package_name"
+
+    - name: Compute Cran Status codes
+      uses: dieghernan/cran-status-check/docker@main
+      with: 
+        statuses: "${{ inputs.statuses }}"
+        package: "${{ steps.current_package.outputs.package_name }}"
