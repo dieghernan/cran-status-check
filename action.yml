@@ -91,6 +91,10 @@ runs:
           err=true
         fi
         echo "err=$err" >> $GITHUB_OUTPUT
+        for filename in $(ls -LR)
+        do
+          echo $filename
+        done;
 
     - name: Get Date
       id: today
@@ -104,7 +108,7 @@ runs:
       uses: peter-evans/create-issue-from-file@v4
       with:
         title: "URGENT! Failed CRAN Checks for ${{ steps.pkg.outputs.package_name }}: ${{ steps.today.outputs.date }}"
-        content-filepath: ././cran-status.md
+        content-filepath: ./${{ inputs.path }}/cran-status.md
         assignees: ${{ inputs.issue-assignees }}
 
     - name: Fail workflow
