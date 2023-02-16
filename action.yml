@@ -1,27 +1,58 @@
-# Workflow derived from https://github.com/pharmaverse/admiralci
-
-name: CRAN Status Check
-description: Creates a summary of issues reported on the CRAN status check page for a given R package
-
+name: cran-status-check
+author: "Diego Hernangómez and admiralci contributors"
+description: "Check the CRAN status for a R package"
+branding:
+  icon: "check"
+  color: "green"
 inputs:
+  path:
+    description: |
+      Path to the R package root, if the package is not at the top level of 
+      the repository.
+    default: "."
+    required: false
+    type: string
   package:
     description: |
-      Package name of the current R package deployed to CRAN
-    required: true
+      Package to check. If provided, it would have priority over the 
+      package on the repo.
+    required: false
+    default: ""
     type: string
   statuses:
     description: |
-      Create an issue if one or more of the following
-      statuses are reported on the check report.
-      This is a comma-separated string of statuses.
-      Allowed statuses are 'NOTE', 'WARN', and 'ERROR'
-    default: 'ERROR'
+      Create an issue if one or more of the following statuses are 
+      reported on the check report. This is a comma-separated string of 
+      statuses. Default value is ''WARN,ERROR'. Allowed statuses are 
+      'NOTE', 'WARN', and 'ERROR'.
+    default: "WARN,ERROR"
+    required: false
+    type: string
+  create-issue:
+    description: |
+      Logical, create an issue on CRAN failed checks
+    default: "true"
+    required: false
+    type: boolean
+  issue-assignees:
+    description: |
+      Whom should the issue be assigned to if errors are
+      encountered in the CRAN status checks?
+      This is a comma-separated string of GitHub usernames.
+      If undefined or empty, no assignments are made.
+    default: ""
     required: false
     type: string
 
+
 runs:
-  using: 'docker'
-  image: './Dockerfile'
-  args:
-    - ${{ inputs.package }}
-    - ${{ inputs.statuses }}
+  using: composite
+  steps:
+    - name: Build and deploy
+      uses: dieghernan/ga-sandbox/.github/workflows/set-jobs@main
+      with:
+        path: ${{inputs.path}}
+        package: ${{inputs.package}}
+        statuses: ${{inputs.statuse}}
+        create-issue: ${{inputs.create-issue}}
+        issue-assignees: ${{inputs.issue-assignees}}
