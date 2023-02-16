@@ -36,8 +36,6 @@ jobs:
         uses: dieghernan/cran-status-check@v1
 ```
 
-The action...
-
 ## Inputs available
 
 ### Package inputs
