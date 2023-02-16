@@ -119,5 +119,5 @@ runs:
       shell: Rscript {0}
       run: |
         # Stop action
-        echo "::error::CRAN checks are not OK, see Job Summary of this GH action for details"
+        cat("::error::CRAN checks are not OK, see Job Summary of this GH action for details")
         stop("CRAN checks are not OK, see Job Summary of this GH action for details")

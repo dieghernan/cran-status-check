@@ -93,7 +93,7 @@ if (!httr::http_error(url)) {
     writeLines(
       paste0(
         "# :heavy_check_mark: ", pkg, "\n\n",
-        sprintf("None of this status found in the CRAN table. (status=`%s``)", status_types)
+        sprintf("None of this status found in the CRAN table. (status=`%s`)", status_types)
       ),
       con = "cran-status.md"
     )
