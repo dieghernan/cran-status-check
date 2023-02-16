@@ -48,11 +48,24 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Build and deploy
-      uses: dieghernan/cran-status-check/.github/workflows/jobs/set-jobs.yml@main
-      with:
-        path: ${{inputs.path}}
-        package: ${{inputs.package}}
-        statuses: ${{inputs.statuse}}
-        create-issue: ${{inputs.create-issue}}
-        issue-assignees: ${{inputs.issue-assignees}}
+    - name: Get current package name
+      id: current_package
+      shell: bash
+      run: |
+        echo "::group::Get package name to check"
+        package_name="${{ inputs.package }}"
+        if [ -z "$package_name" ]; then 
+          path="${{ inputs.path }}"
+          if [ -z "$package_name" ]; then
+            path="."
+          fi
+          package_name=$(grep "Package:" $path/DESCRIPTION | awk '{print $NF}')
+        fi
+        if [ -z "$package_name" ]; then 
+          echo "::error::DESCRIPTION file not found on $path dir"
+          exit 1
+        fi
+        echo "package_name=$package_name" >> $GITHUB_OUTPUT
+        echo "::endgroup::"
+        
+        echo "Testing package: $package_name"
