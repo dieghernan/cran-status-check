@@ -1,0 +1,50 @@
+Type: Package
+Package: giscoR
+Title: Download Map Data from GISCO API - Eurostat
+Version: 0.3.2.9000
+Authors@R: c(
+    person("Diego", "Hernangómez", , "diego.hernangomezherrero@gmail.com", role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "0000-0001-8457-4658", affiliation = "rOpenGov")),
+    person("EuroGeographics", role = "cph",
+           comment = c(note = "for the administrative boundaries.")),
+    person("Vincent", "Arel-Bundock", role = "cph",
+           comment = c(ORCID = "0000-0003-2042-7063", note = "for the gisco_countrycode dataset."))
+  )
+Description: Tools to download data from the GISCO (Geographic Information
+    System of the Commission) Eurostat database
+    <https://ec.europa.eu/eurostat/web/gisco>. Global and European map
+    data available.  This package is in no way officially related to or
+    endorsed by Eurostat.
+License: GPL-3
+URL: https://ropengov.github.io/giscoR/,
+    https://github.com/rOpenGov/giscoR
+BugReports: https://github.com/rOpenGov/giscoR/issues
+Depends: 
+    R (>= 3.6.0)
+Imports: 
+    countrycode (>= 1.2.0),
+    geojsonsf (>= 2.0.0),
+    rappdirs (>= 0.3.0),
+    sf (>= 0.9.0),
+    utils
+Suggests: 
+    eurostat,
+    ggplot2 (>= 3.0.0),
+    knitr,
+    lwgeom (>= 0.2-2),
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: 
+    knitr
+Config/testthat/edition: 3
+Config/testthat/parallel: true
+Copyright: General Copyright © European Union, 1995 - today. See file
+    COPYRIGHTS for specific provisions.
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+X-schema.org-applicationCategory: cartography
+X-schema.org-isPartOf: http://ropengov.org/
+X-schema.org-keywords: ropengov, r, spatial, api-wrapper, rstats,
+    r-package, eurostat, gisco, thematic-maps, eurostat-data
