@@ -97,7 +97,9 @@ runs:
 
     - name: Get Date
       id: today
+      shell: bash
       run: |
+        # Get current time
         echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
     - name: Report Status
@@ -111,5 +113,6 @@ runs:
     - name: Fail workflow
       if: ${{ steps.cran_errors_status.outputs.new_errors == 'true' }}
       shell: Rscript {0}
-      run |
+      run: |
+        # Stop action
         stop("CRAN checks are not ok, see Job Summary of this GH action for details")
