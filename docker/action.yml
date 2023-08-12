@@ -25,3 +25,4 @@ runs:
   args:
     - ${{ inputs.package }}
     - ${{ inputs.statuses }}
+

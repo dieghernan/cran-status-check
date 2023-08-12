@@ -5,23 +5,23 @@ on:
     inputs:
       path:
         description: |
-          Path to the R package root, if the package is not at the top level of 
+          Path to the R package root, if the package is not at the top level of
           the repository.
         default: "."
         required: false
         type: string
       package:
         description: |
-          Package to check. If provided, it would have priority over the 
+          Package to check. If provided, it would have priority over the
           package on the repo.
         required: false
         default: ""
         type: string
       statuses:
         description: |
-          Create an issue if one or more of the following statuses are 
-          reported on the check report. This is a comma-separated string of 
-          statuses. Default value is ''WARN,ERROR'. Allowed statuses are 
+          Create an issue if one or more of the following statuses are
+          reported on the check report. This is a comma-separated string of
+          statuses. Default value is ''WARN,ERROR'. Allowed statuses are
           'NOTE', 'WARN', and 'ERROR'.
         default: "WARN,ERROR"
         required: false
@@ -58,7 +58,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
+
       - name: Check
         uses: dieghernan/cran-status-check@main
         with:
@@ -68,3 +68,4 @@ jobs:
           fail-on-error: ${{ inputs.fail-on-error }}
           create-issue: ${{ inputs.create-issue }}
           issue-assignees: ${{ inputs.issue-assignees }}
+
