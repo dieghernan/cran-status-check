@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v3
         
       - name: Check
-        uses: dieghernan/cran-status-check@v1
+        uses: dieghernan/cran-status-check@v2
 ```
 
 ## Inputs available
@@ -45,7 +45,7 @@ jobs:
 
     ``` yaml
       - name: Check
-        uses: dieghernan/cran-status-check@v1
+        uses: dieghernan/cran-status-check@v2
         with:
           path: "Rpackage"
     ```
@@ -57,12 +57,12 @@ jobs:
     ``` yaml
 
       - name: Check dplyr
-        uses: dieghernan/cran-status-check@v1
+        uses: dieghernan/cran-status-check@v2
         with:
           package: "dplyr"
 
       - name: Check ggplot2
-        uses: dieghernan/cran-status-check@v1
+        uses: dieghernan/cran-status-check@v2
         with:
           package: "ggplot2"    
     ```
@@ -74,12 +74,12 @@ jobs:
     ``` yaml
 
       - name: Check dplyr
-        uses: dieghernan/cran-status-check@v1
+        uses: dieghernan/cran-status-check@v2
         with:
           package: "dplyr"
 
       - name: Check ggplot2
-        uses: dieghernan/cran-status-check@v1
+        uses: dieghernan/cran-status-check@v2
         with:
           package: "ggplot2"    
     ```
@@ -93,13 +93,13 @@ jobs:
     ``` yaml
 
       - name: Check a package not in CRAN
-        uses: dieghernan/cran-status-check@v1
+        uses: dieghernan/cran-status-check@v2
         with:
           package: "iamnotincran"
           fail-on-error: "false"
 
       - name: Check igoR even if the previous step has failed but stop here
-        uses: dieghernan/cran-status-check@v1
+        uses: dieghernan/cran-status-check@v2
         with:
           package: "igoR"
           statuses: "NOTE,WARN,ERROR"
@@ -121,7 +121,7 @@ jobs:
     ``` yaml
 
     -  name: Check igoR and create issue 
-       uses: dieghernan/cran-status-check@v1
+       uses: dieghernan/cran-status-check@v2
        with: 
          package: "igoR" 
          statuses: "NOTE,WARN,ERROR" 
