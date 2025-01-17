@@ -124,9 +124,9 @@ runs:
 
     - name: Fail workflow
       if: steps.err.outputs.error == 'true' && inputs.fail-on-error == 'true'
-      shell: Rscript {0}
+      shell: bash
       run: |
         # Stop action
-        cat("::error::CRAN checks are not OK, see Job Summary of this GH action for details")
-        stop("CRAN checks are not OK, see Job Summary of this GH action for details")
+        echo "::error::CRAN checks are not OK, see Job Summary of this GH action for details"
+        exit 1
 
