@@ -1,4 +1,4 @@
-FROM rocker/tidyverse:4.4.3
+FROM rocker/tidyverse:4.5.0
 
 WORKDIR /app
 
