@@ -30,8 +30,8 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-        
+        uses: actions/checkout@v4
+
       - name: Check
         uses: dieghernan/cran-status-check@v2
 ```
