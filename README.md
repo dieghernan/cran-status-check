@@ -24,7 +24,8 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    permissions: write-all # This line is important for creating issues, should be on jobs or global
+    permissions:
+      issues: write
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
