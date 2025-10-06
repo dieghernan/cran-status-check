@@ -17,15 +17,6 @@ on:
         required: false
         default: ""
         type: string
-      statuses:
-        description: |
-          Create an issue if one or more of the following statuses are
-          reported on the check report. This is a comma-separated string of
-          statuses. Default value is ''WARN,ERROR'. Allowed statuses are
-          'NOTE', 'WARN', and 'ERROR'.
-        default: "WARN,ERROR"
-        required: false
-        type: string
       fail-on-error:
         description: |
           Logical, should the action error if CRAN checks are not ok?
@@ -60,11 +51,10 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Check
-        uses: dieghernan/cran-status-check@main
+        uses: dieghernan/cran-status-check@dev
         with:
           path: ${{ inputs.path }}
           package: ${{ inputs.package }}
-          statuses: ${{ inputs.statuses }}
           fail-on-error: ${{ inputs.fail-on-error }}
           create-issue: ${{ inputs.create-issue }}
           issue-assignees: ${{ inputs.issue-assignees }}
