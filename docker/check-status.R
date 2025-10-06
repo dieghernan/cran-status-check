@@ -26,11 +26,6 @@ option_list <- list(
     type = "character",
     help = "package name (REQUIRED)",
     metavar = "character"
-  ),
-  make_option(c("-s", "--statuses"),
-    type = "character", default = "ERROR,WARN,NOTE",
-    help = "status types (comma separated list, e.g. ERROR,WARN,NOTE",
-    metavar = "character"
   )
 )
 opt_parser <- OptionParser(option_list = option_list)
@@ -43,17 +38,21 @@ cran_status <- function(x) {
 
 # 2. Get Inputs ----
 pkg <- opt$package # paste(desc::desc_get(keys = "Package"))
-# Get input status
-status_types <- opt$statuses
-statuses <- unlist(strsplit(status_types, split = ","))
-
 url <- sprintf("https://cran.r-project.org/web/checks/check_results_%s.html", pkg)
 
 # 3. Tests -----
 cat("Testing package:", pkg, "\n-----\n")
-## a. Url not reachable ----
 
-if (httr::http_error(url)) {
+# Getting database
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+pkg_db <- tools::CRAN_package_db() %>%
+  as_tibble() %>%
+  filter(Package == pkg)
+
+
+## a. Not in database ----
+
+if (nrow(pkg_db) == 0) {
   cat(
     paste0("::warning::Package ", pkg, " not found on CRAN.")
   )
@@ -62,15 +61,17 @@ if (httr::http_error(url)) {
     paste0(":x: **Package ", pkg, " not found on CRAN**:\n\n")
   )
 
-  cran_status(paste0("Error accessing url:\n", url))
+  cran_status(paste0("Check url:\n", url))
 
   # Copy to issue
   file.copy("cran-status.md", "issue.md")
 }
 
-## b. Found on CRAN, check issues ----
+## b. Found on CRAN, check deadline ----
 
 if (!file.exists("cran-status.md")) {
+  deadline <- pkg_db %>% pull(Deadline)
+
   scrap <- url %>%
     read_html()
 
@@ -78,25 +79,39 @@ if (!file.exists("cran-status.md")) {
     html_element("table") %>%
     html_table()
 
-  any_error <- any(cranchecks$Status %in% statuses)
   additional <- grepl("Additional", html_text(scrap), ignore.case = TRUE)
 
-  ### i. Has issues ----
-  if (any_error) {
+  # Is on deadline?
+  is_deadline <- !is.na(deadline)
+
+  if (is_deadline) {
+    # Notify
     cran_status(sprintf(
-      ":x: **CRAN checks for %s resulted in one or more (`%s`)s**:\n\n",
+      ":x: **Package %s at risk for removal by `%s`**:\n\n",
       pkg,
-      status_types
+      deadline
     ))
-    cran_status("\nSee the table below for a summary of the checks run by CRAN:\n\n")
-    cran_status(knitr::kable(cranchecks))
+
+    cat("::warning::Package at risk for removal")
+  } else {
     cran_status(sprintf(
-      "\n\nAll details and logs are available here: %s\n\n", url
+      ":white_check_mark: **Package %s is not at risk for removal",
+      pkg
     ))
-    cat("::warning::One or more CRAN checks resulted in an invalid status\n")
+
+    cat("Package is not at risk for removal")
   }
 
-  ### ii. Has additional issues ----
+  # Additional info
+
+  # Add checks
+  cran_status("\nSee the table below for a summary of the checks run by CRAN:\n\n")
+  cran_status(knitr::kable(cranchecks))
+  cran_status(sprintf(
+    "\n\nAll details and logs are available here: %s", url
+  ))
+
+  # Additional issues
 
   if (additional) {
     cran_status(sprintf(
@@ -109,27 +124,7 @@ if (!file.exists("cran-status.md")) {
     cat(paste0("::warning::", pkg, " has Additional issues\n"))
   }
 
-  ## So far if cran-status.md exists, generate issue
-  if (file.exists("cran-status.md")) file.copy("cran-status.md", "issue.md")
 
-  ### iii. All OK ----
-  # If no issue has been generated
-
-  if (!file.exists("cran-status.md")) {
-    cat(
-      sprintf("None of this status found in the CRAN table. (status=%s)", status_types)
-    )
-
-    cran_status(sprintf(
-      ":white_check_mark: **CRAN error for %s not found with (`%s`)s**:\n\n",
-      pkg,
-      status_types
-    ))
-
-    cran_status("\nSee the table below for a summary of the checks run by CRAN:\n\n")
-    cran_status(knitr::kable(cranchecks))
-    cran_status(sprintf(
-      "\n\nAll details and logs are available here: %s", url
-    ))
-  }
+  # Prepare the issue
+  if (is_deadline) file.copy("cran-status.md", "issue.md")
 }
