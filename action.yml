@@ -112,7 +112,7 @@ runs:
 
     - name: Report Status
       if: steps.err.outputs.error == 'true' && inputs.create-issue == 'true'
-      uses: peter-evans/create-issue-from-file@v5
+      uses: peter-evans/create-issue-from-file@v6
       with:
         title: "URGENT! ${{ steps.pkg.outputs.package_name }} at risk on CRAN: ${{ steps.today.outputs.date }}"
         content-filepath: ././cran-status.md
