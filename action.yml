@@ -19,14 +19,6 @@ inputs:
     required: false
     default: ""
     type: string
-  statuses:
-    description: |
-      CRAN status to check. This is a comma-separated string of
-      statuses. Default value is ''WARN,ERROR'. Allowed statuses are
-      'NOTE', 'WARN', and 'ERROR'.
-    default: "WARN,ERROR"
-    required: false
-    type: string
   fail-on-error:
     description: |
       Logical, should the action error if CRAN checks are not ok?
@@ -48,7 +40,12 @@ inputs:
     default: ""
     required: false
     type: string
-
+  statuses:
+    description: |
+      DEPRECATED
+    default: ""
+    required: false
+    type: string
 # Workflow derived from pharmaverse/admiralci
 # See for the original work from which this workflow is derived
 # https://github.com/pharmaverse/admiralci/blob/61347fe11955297818b3ca7814fc7328f2ad7840/.github/workflows/cran-status.yml
@@ -85,7 +82,6 @@ runs:
     - name: Compute Cran Status codes
       uses: dieghernan/cran-status-check/docker@main
       with:
-        statuses: "${{ inputs.statuses }}"
         package: "${{ steps.pkg.outputs.package_name }}"
 
       # Report check
@@ -118,7 +114,7 @@ runs:
       if: steps.err.outputs.error == 'true' && inputs.create-issue == 'true'
       uses: peter-evans/create-issue-from-file@v5
       with:
-        title: "URGENT! Failed CRAN Checks for ${{ steps.pkg.outputs.package_name }}: ${{ steps.today.outputs.date }}"
+        title: "URGENT! ${{ steps.pkg.outputs.package_name }} at risk on CRAN: ${{ steps.today.outputs.date }}"
         content-filepath: ././cran-status.md
         assignees: ${{ inputs.issue-assignees }}
 
@@ -127,6 +123,6 @@ runs:
       shell: bash
       run: |
         # Stop action
-        echo "::error::CRAN checks are not OK, see Job Summary of this GH action for details"
+        echo "::error::Package at risk, see Job Summary of this GH action for details"
         exit 1
 
